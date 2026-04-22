@@ -1,0 +1,9 @@
+#services:
+#  postgres:
+#    image: 'postgres:latest'
+#    environment:
+#      - 'POSTGRES_DB=assignment_db'
+#      - 'POSTGRES_PASSWORD=${SPRING_DATASOURCE_PASSWORD}'
+#      - 'POSTGRES_USER=myuser'
+#    ports:
+#      - '5432'
