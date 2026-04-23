@@ -25,18 +25,21 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(req));
     }
 
     @PostMapping("/login")
     @Operation(summary = "Login and get JWT token")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest req) {
         return ResponseEntity.ok(authService.login(req));
     }
 
     @GetMapping("/me")
     @Operation(summary = "Get current user", security = @SecurityRequirement(name = "bearerAuth"))
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<AuthResponse> me(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
         return ResponseEntity.ok(new AuthResponse(null, user.getId(), user.getName(), user.getEmail(), user.getRole()));

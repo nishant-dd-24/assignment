@@ -24,12 +24,14 @@ public class TaskController {
 
     @GetMapping
     @Operation(summary = "Get all tasks (admin=all, user=own)")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<TaskResponse>> getAll(@AuthenticationPrincipal UserDetails u) {
         return ResponseEntity.ok(taskService.getAllTasks(u.getUsername()));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get task by ID")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<TaskResponse> getOne(@PathVariable Long id,
                                                @AuthenticationPrincipal UserDetails u) {
         return ResponseEntity.ok(taskService.getTask(id, u.getUsername()));
@@ -37,6 +39,7 @@ public class TaskController {
 
     @PostMapping
     @Operation(summary = "Create a new task")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<TaskResponse> create(@Valid @RequestBody TaskRequest req,
                                                @AuthenticationPrincipal UserDetails u) {
         return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(req, u.getUsername()));
@@ -44,6 +47,7 @@ public class TaskController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a task")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<TaskResponse> update(@PathVariable Long id,
                                                @Valid @RequestBody TaskRequest req,
                                                @AuthenticationPrincipal UserDetails u) {
@@ -52,6 +56,7 @@ public class TaskController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a task")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> delete(@PathVariable Long id,
                                        @AuthenticationPrincipal UserDetails u) {
         taskService.deleteTask(id, u.getUsername());

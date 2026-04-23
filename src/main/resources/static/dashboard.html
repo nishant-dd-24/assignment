@@ -1,10 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .form-box { border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+        input, select { display: block; width: 100%; padding: 8px; margin-bottom: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .task-card { border: 1px solid #eee; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .badge { background: #eee; border-radius: 12px; padding: 2px 10px; font-size: 12px; margin-left: 8px; }
+        .msg { padding: 8px; border-radius: 4px; margin-bottom: 10px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #ffe0e0; color: #c00; }
+        .logout { background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+    </style>
 </head>
 <body>
+<div class="header">
+    <h2 id="welcome">Dashboard</h2>
+    <button class="logout" onclick="logout()">Logout</button>
+</div>
+<div id="msg" class="msg" style="display:none"></div>
 
+<div class="form-box">
+    <h3 id="form-title">New Task</h3>
+    <input type="hidden" id="editId" />
+    <input type="text" id="title" placeholder="Task title" />
+    <input type="text" id="description" placeholder="Description (optional)" />
+    <select id="status">
+        <option value="TODO">TODO</option>
+        <option value="IN_PROGRESS">IN PROGRESS</option>
+        <option value="DONE">DONE</option>
+    </select>
+    <button class="btn btn-primary" onclick="submitTask()">Save Task</button>
+    <button class="btn btn-secondary" id="cancelBtn" onclick="cancelEdit()" style="display:none;margin-left:8px">Cancel</button>
+</div>
+
+<div id="taskList"></div>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    document.getElementById('welcome').textContent = `Dashboard - ${user.name} (${user.role})`;
+
+    const authHeaders = () => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    let allTasks = [];
+
+    function showMsg(text, type) {
+        const el = document.getElementById('msg');
+        el.style.display = 'block';
+        el.className = 'msg ' + type;
+        el.textContent = text;
+        setTimeout(() => el.style.display = 'none', 3000);
+    }
+
+    async function loadTasks() {
+        const res = await fetch('/api/v1/tasks', { headers: authHeaders() });
+        if (res.status === 401) { logout(); return; }
+        allTasks = await res.json();
+
+        const list = document.getElementById('taskList');
+        list.innerHTML = allTasks.length === 0
+            ? '<p style="color:#999">No tasks yet. Create one above!</p>'
+            : allTasks.map(t => `
+              <div class="task-card">
+                <div>
+                  <strong>${t.title}</strong>
+                  <span class="badge">${t.status}</span>
+                  ${t.description ? `<p style="margin:4px 0 0;color:#666;font-size:14px">${t.description}</p>` : ''}
+                  <p style="margin:2px 0 0;color:#999;font-size:12px">Owner: ${t.ownerName}</p>
+                </div>
+                <div>
+                  <button class="btn btn-secondary" onclick="startEdit(${t.id})" style="margin-right:6px">Edit</button>
+                  <button class="btn btn-danger" onclick="deleteTask(${t.id})">Delete</button>
+                </div>
+              </div>`).join('');
+    }
+
+    function startEdit(id) {
+        const task = allTasks.find(t => t.id === id);
+        if (!task) return;
+        document.getElementById('editId').value = task.id;
+        document.getElementById('title').value = task.title;
+        document.getElementById('description').value = task.description || '';
+        document.getElementById('status').value = task.status;
+        document.getElementById('form-title').textContent = 'Edit Task';
+        document.getElementById('cancelBtn').style.display = 'inline-block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+        document.getElementById('editId').value = '';
+        document.getElementById('title').value = '';
+        document.getElementById('description').value = '';
+        document.getElementById('status').value = 'TODO';
+        document.getElementById('form-title').textContent = 'New Task';
+        document.getElementById('cancelBtn').style.display = 'none';
+    }
+
+    async function submitTask() {
+        const id = document.getElementById('editId').value;
+        const body = {
+            title: document.getElementById('title').value,
+            description: document.getElementById('description').value,
+            status: document.getElementById('status').value
+        };
+        const url = id ? `/api/v1/tasks/${id}` : '/api/v1/tasks';
+        const method = id ? 'PUT' : 'POST';
+        const res = await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!res.ok) { showMsg(data.message || 'Error', 'error'); return; }
+        showMsg(id ? 'Task updated!' : 'Task created!', 'success');
+        cancelEdit();
+        loadTasks();
+    }
+
+    async function deleteTask(id) {
+        if (!confirm('Delete this task?')) return;
+        const res = await fetch(`/api/v1/tasks/${id}`, { method: 'DELETE', headers: authHeaders() });
+        if (!res.ok) { showMsg('Failed to delete task', 'error'); return; }
+        showMsg('Task deleted', 'success');
+        await loadTasks();
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = '/login.html';
+    }
+
+    loadTasks();
+</script>
 </body>
 </html>
