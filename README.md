@@ -2,11 +2,15 @@
 
 A secure, scalable REST API built with **Java 21 + Spring Boot 4**, featuring JWT authentication, role-based access control, and a vanilla JS frontend — all served from a single deployable service.
 
+**Live:** https://assignment.nishantdd.dev  |  **Docker Hub:** https://hub.docker.com/r/nishantdd/assignment-api
+
 ---
 
 ## Quick Start
 
 ### Option 1 — Docker (Recommended)
+
+The image is published to Docker Hub on every push to `main`. No build step needed.
 
 ```bash
 git clone https://github.com/nishant-dd-24/assignment.git
@@ -16,18 +20,18 @@ cd assignment
 cp .env.example .env
 # Edit .env and set secure values for passwords and JWT secret
 
-# 2. Build and start
+# 2. Pull the latest image and start all services
 docker compose up --pull always
 ```
 
-| Service                 | URL                                         |
-|-------------------------|---------------------------------------------|
-| Frontend (Landing page) | http://localhost:8080                       |
-| Login                   | http://localhost:8080/login.html            |
-| Register                | http://localhost:8080/register.html         |
-| Dashboard               | http://localhost:8080/dashboard.html        |
-| Swagger UI              | http://localhost:8080/swagger-ui/index.html |
-| API Docs (JSON)         | http://localhost:8080/api-docs              |
+| Service                 | Local URL                                   | Live URL                                          |
+|-------------------------|---------------------------------------------|---------------------------------------------------|
+| Frontend (Landing page) | http://localhost:8080                       | https://assignment.nishantdd.dev                  |
+| Login                   | http://localhost:8080/login.html            | https://assignment.nishantdd.dev/login.html       |
+| Register                | http://localhost:8080/register.html         | https://assignment.nishantdd.dev/register.html    |
+| Dashboard               | http://localhost:8080/dashboard.html        | https://assignment.nishantdd.dev/dashboard.html   |
+| Swagger UI              | http://localhost:8080/swagger-ui/index.html | https://assignment.nishantdd.dev/swagger-ui/index.html |
+| API Docs (JSON)         | http://localhost:8080/api-docs              | https://assignment.nishantdd.dev/api-docs         |
 
 ### Option 2 — Local (requires PostgreSQL running)
 
@@ -62,6 +66,8 @@ cp .env.example .env
 | Build            | Maven                                |
 | Containerisation | Docker + Docker Compose              |
 | Testing          | JUnit 5 + Mockito                    |
+| CI/CD            | GitHub Actions                       |
+| Image Registry   | Docker Hub                           |
 
 ---
 
@@ -301,6 +307,48 @@ cp .env.example .env
 | `ADMIN_PASSWORD`             | `12345678`             | Seeded admin password                    |
 | `ADMIN_NAME`                 | `Admin`                | Seeded admin display name                |
 | `JAVA_OPTS`                  | `-Xms256m -Xmx512m`    | JVM memory flags passed to the container |
+
+---
+
+## CI/CD and Deployment
+
+The project is deployed to a VPS via a GitHub Actions pipeline that triggers on every push to `main`.
+
+### Pipeline steps (`deploy.yml`)
+
+1. Check out the repository
+2. Log in to Docker Hub using repository secrets
+3. Build the Docker image and tag it as `nishantdd/assignment-api:latest`
+4. Push the image to Docker Hub
+5. SSH into the VPS and run `docker compose -f docker-compose.prod.yml up -d --force-recreate`
+6. Prune dangling images to keep the server clean
+
+### Docker Compose file layout
+
+The project uses three compose files to keep local and production concerns separate:
+
+| File                        | Purpose                                                               |
+|-----------------------------|-----------------------------------------------------------------------|
+| `docker-compose.yml`        | Base configuration — image, environment variables, healthcheck, volumes |
+| `docker-compose.override.yml` | Local development — exposes port `8080` to the host               |
+| `docker-compose.prod.yml`   | Production — uses `expose` instead of `ports` so only the reverse proxy can reach the container |
+
+Locally, Docker Compose automatically merges `docker-compose.yml` and `docker-compose.override.yml`, so `docker compose up` works without any extra flags.
+
+On the VPS, the pipeline explicitly selects the production overlay:
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --force-recreate
+```
+
+### Required GitHub Actions secrets
+
+| Secret               | Description                              |
+|----------------------|------------------------------------------|
+| `DOCKER_USERNAME`    | Docker Hub username                      |
+| `DOCKER_PASSWORD`    | Docker Hub access token                  |
+| `SERVER_IP`          | VPS IP address or hostname               |
+| `SSH_PRIVATE_KEY`    | Private key for SSH access to the VPS    |
 
 ---
 
