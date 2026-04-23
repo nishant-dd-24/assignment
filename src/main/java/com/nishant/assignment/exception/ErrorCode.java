@@ -1,0 +1,16 @@
+package com.nishant.assignment.exception;
+
+
+public enum ErrorCode {
+    NOT_FOUND,
+    ALREADY_EXISTS,
+    VALIDATION_FAILED,
+    INVALID_ENUM_VALUE,
+    ILLEGAL_ARGUMENT,
+    ACCESS_DENIED,
+    UNAUTHENTICATED,
+    BAD_REQUEST,
+    RATE_LIMIT_EXCEEDED,
+    DATA_INTEGRITY_VIOLATION,
+    INTERNAL_ERROR
+}
