@@ -1,8 +1,28 @@
 # Task Management API - Backend Intern Assignment
 
-A secure, scalable REST API built with **Java 21 + Spring Boot 4**, featuring JWT authentication, role-based access control, and a vanilla JS frontend — all served from a single deployable service.
+🚀 **Live Demo:** https://assignment.nishantdd.dev
 
-**Live:** https://assignment.nishantdd.dev  |  **Docker Hub:** https://hub.docker.com/r/nishantdd/assignment-api
+⚡ No setup required — fully deployed (Dockerized + CI/CD)
+
+🔐 Quick Test Credentials
+
+Admin:
+- Email: admin@example.com
+- Password: 12345678
+  → Can view and manage all tasks
+
+User:
+- Email: user@example.com
+- Password: 12345678
+  → Can only manage own tasks
+
+👉 Try:
+- Creating tasks as user
+- Logging in as admin and viewing all tasks
+
+**Docker Hub:** https://hub.docker.com/r/nishantdd/assignment-api
+
+A secure, scalable REST API built with **Java 21 + Spring Boot 4**, featuring JWT authentication, role-based access control, and a vanilla JS frontend — all served from a single deployable service.
 
 ---
 
@@ -16,11 +36,8 @@ The image is published to Docker Hub on every push to `main`. No build step need
 git clone https://github.com/nishant-dd-24/assignment.git
 cd assignment
 
-# 1. Create your environment file from the example
 cp .env.example .env
-# Edit .env and set secure values for passwords and JWT secret
 
-# 2. Pull the latest image and start all services
 docker compose up --pull always
 ```
 
@@ -340,6 +357,12 @@ On the VPS, the pipeline explicitly selects the production overlay:
 ```bash
 docker compose -f docker-compose.prod.yml up -d --force-recreate
 ```
+
+### Deployment Architecture (Brief)
+
+- Nginx reverse proxy handles HTTPS and routes traffic to the API container
+- Services communicate via Docker internal network (no exposed backend ports)
+- Stateless API allows horizontal scaling behind the proxy
 
 ### Required GitHub Actions secrets
 
