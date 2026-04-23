@@ -3,44 +3,241 @@
 <head>
     <title>Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .form-box { border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
-        input, select { display: block; width: 100%; padding: 8px; margin-bottom: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
-        .btn-primary { background: #007bff; color: white; }
-        .btn-danger { background: #dc3545; color: white; }
-        .btn-secondary { background: #6c757d; color: white; }
-        .task-card { border: 1px solid #eee; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .badge { background: #eee; border-radius: 12px; padding: 2px 10px; font-size: 12px; margin-left: 8px; }
-        .msg { padding: 8px; border-radius: 4px; margin-bottom: 10px; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #ffe0e0; color: #c00; }
-        .logout { background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #16a34a;
+            --success-bg: #dcfce7;
+            --danger: #dc2626;
+            --danger-bg: #fee2e2;
+            --gray-bg: #f3f4f6;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #d1d5db;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 28px 16px 42px;
+            background: var(--gray-bg);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 920px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .form-box {
+            background: var(--card);
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        .form-box h3 {
+            margin: 0 0 12px;
+            font-size: 18px;
+        }
+
+        .field {
+            display: block;
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .field::placeholder { color: #94a3b8; }
+
+        .field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+        }
+
+        .actions-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 9px 14px;
+            transition: transform 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+        }
+
+        .btn:hover { transform: translateY(-1px); filter: brightness(0.98); }
+        .btn:active { transform: translateY(0); }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-secondary { background: #64748b; color: #fff; }
+
+        .logout {
+            background: #475569;
+            color: #fff;
+        }
+
+        .msg {
+            display: none;
+            margin-bottom: 14px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+            animation: fadeIn 0.25s ease;
+            font-size: 14px;
+        }
+
+        .success {
+            background: var(--success-bg);
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+
+        .error {
+            background: var(--danger-bg);
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .task-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .empty-state {
+            color: var(--muted);
+            margin: 4px 0;
+            font-size: 14px;
+        }
+
+        .task-card {
+            background: var(--card);
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: flex-start;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        .task-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .task-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .task-desc {
+            margin: 0;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .task-meta {
+            margin: 4px 0 0;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .badge {
+            border-radius: 999px;
+            padding: 3px 9px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-todo { background: #e2e8f0; color: #334155; }
+        .badge-in-progress { background: #dbeafe; color: #1d4ed8; }
+        .badge-done { background: #dcfce7; color: #15803d; }
+
+        .hidden { display: none; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-2px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-<div class="header">
-    <h2 id="welcome">Dashboard</h2>
-    <button class="logout" onclick="logout()">Logout</button>
-</div>
-<div id="msg" class="msg" style="display:none"></div>
+<div class="container">
+    <div class="header">
+        <h2 id="welcome">Dashboard</h2>
+        <button class="btn logout" onclick="logout()">Logout</button>
+    </div>
+    <div id="msg" class="msg"></div>
 
-<div class="form-box">
-    <h3 id="form-title">New Task</h3>
-    <input type="hidden" id="editId" />
-    <input type="text" id="title" placeholder="Task title" />
-    <input type="text" id="description" placeholder="Description (optional)" />
-    <select id="status">
-        <option value="TODO">TODO</option>
-        <option value="IN_PROGRESS">IN PROGRESS</option>
-        <option value="DONE">DONE</option>
-    </select>
-    <button class="btn btn-primary" onclick="submitTask()">Save Task</button>
-    <button class="btn btn-secondary" id="cancelBtn" onclick="cancelEdit()" style="display:none;margin-left:8px">Cancel</button>
-</div>
+    <div class="form-box">
+        <h3 id="form-title">New Task</h3>
+        <input type="hidden" id="editId" />
+        <input class="field" type="text" id="title" placeholder="Task title" />
+        <input class="field" type="text" id="description" placeholder="Description (optional)" />
+        <select class="field" id="status">
+            <option value="TODO">TODO</option>
+            <option value="IN_PROGRESS">IN PROGRESS</option>
+            <option value="DONE">DONE</option>
+        </select>
+        <div class="actions-row">
+            <button id="saveBtn" class="btn btn-primary" onclick="submitTask()">Save Task</button>
+            <button class="btn btn-secondary hidden" id="cancelBtn" onclick="cancelEdit()">Cancel</button>
+        </div>
+    </div>
 
-<div id="taskList"></div>
+    <div id="taskList" class="task-list"></div>
+</div>
 
 <script>
     const token = localStorage.getItem('token');
@@ -51,6 +248,12 @@
 
     const authHeaders = () => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
     let allTasks = [];
+
+    function getStatusClass(status) {
+        if (status === 'IN_PROGRESS') return 'badge-in-progress';
+        if (status === 'DONE') return 'badge-done';
+        return 'badge-todo';
+    }
 
     function showMsg(text, type) {
         const el = document.getElementById('msg');
@@ -67,17 +270,19 @@
 
         const list = document.getElementById('taskList');
         list.innerHTML = allTasks.length === 0
-            ? '<p style="color:#999">No tasks yet. Create one above!</p>'
+            ? '<p class="empty-state">No tasks yet. Create one above!</p>'
             : allTasks.map(t => `
               <div class="task-card">
                 <div>
-                  <strong>${t.title}</strong>
-                  <span class="badge">${t.status}</span>
-                  ${t.description ? `<p style="margin:4px 0 0;color:#666;font-size:14px">${t.description}</p>` : ''}
-                  <p style="margin:2px 0 0;color:#999;font-size:12px">Owner: ${t.ownerName}</p>
+                  <div class="task-title-row">
+                    <span class="task-title">${t.title}</span>
+                    <span class="badge ${getStatusClass(t.status)}">${t.status}</span>
+                  </div>
+                  ${t.description ? `<p class="task-desc">${t.description}</p>` : ''}
+                  <p class="task-meta">Owner: ${t.ownerName}</p>
                 </div>
-                <div>
-                  <button class="btn btn-secondary" onclick="startEdit(${t.id})" style="margin-right:6px">Edit</button>
+                <div class="task-actions">
+                  <button class="btn btn-secondary" onclick="startEdit(${t.id})">Edit</button>
                   <button class="btn btn-danger" onclick="deleteTask(${t.id})">Delete</button>
                 </div>
               </div>`).join('');
@@ -91,8 +296,9 @@
         document.getElementById('description').value = task.description || '';
         document.getElementById('status').value = task.status;
         document.getElementById('form-title').textContent = 'Edit Task';
-        document.getElementById('cancelBtn').style.display = 'inline-block';
+        document.getElementById('cancelBtn').classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        document.getElementById('title').focus();
     }
 
     function cancelEdit() {
@@ -101,10 +307,11 @@
         document.getElementById('description').value = '';
         document.getElementById('status').value = 'TODO';
         document.getElementById('form-title').textContent = 'New Task';
-        document.getElementById('cancelBtn').style.display = 'none';
+        document.getElementById('cancelBtn').classList.add('hidden');
     }
 
     async function submitTask() {
+        const saveBtn = document.getElementById('saveBtn');
         const id = document.getElementById('editId').value;
         const body = {
             title: document.getElementById('title').value,
@@ -113,20 +320,33 @@
         };
         const url = id ? `/api/v1/tasks/${id}` : '/api/v1/tasks';
         const method = id ? 'PUT' : 'POST';
-        const res = await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(body) });
-        const data = await res.json();
-        if (!res.ok) { showMsg(data.message || 'Error', 'error'); return; }
-        showMsg(id ? 'Task updated!' : 'Task created!', 'success');
-        cancelEdit();
-        loadTasks();
+        saveBtn.disabled = true;
+        saveBtn.textContent = id ? 'Updating...' : 'Saving...';
+        try {
+            const res = await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(body) });
+            const data = await res.json();
+            if (!res.ok) { showMsg(data.message || 'Error', 'error'); return; }
+            showMsg(id ? 'Task updated!' : 'Task created!', 'success');
+            cancelEdit();
+            loadTasks();
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Task';
+        }
     }
 
     async function deleteTask(id) {
         if (!confirm('Delete this task?')) return;
-        const res = await fetch(`/api/v1/tasks/${id}`, { method: 'DELETE', headers: authHeaders() });
-        if (!res.ok) { showMsg('Failed to delete task', 'error'); return; }
-        showMsg('Task deleted', 'success');
-        await loadTasks();
+        const deleteButtons = document.querySelectorAll('.btn-danger');
+        deleteButtons.forEach(btn => btn.disabled = true);
+        try {
+            const res = await fetch(`/api/v1/tasks/${id}`, { method: 'DELETE', headers: authHeaders() });
+            if (!res.ok) { showMsg('Failed to delete task', 'error'); return; }
+            showMsg('Task deleted', 'success');
+            await loadTasks();
+        } finally {
+            deleteButtons.forEach(btn => btn.disabled = false);
+        }
     }
 
     function logout() {

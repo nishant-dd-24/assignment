@@ -2,20 +2,17 @@ package com.nishant.assignment.dto;
 
 import com.nishant.assignment.entity.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 
-@Builder
-@Schema(description = "Authentication response containing JWT and user details")
-public record AuthResponse(
-        @Schema(description = "JWT bearer token", example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIn0.signature")
-        String token,
+@Schema(description = "Current authenticated user details")
+public record MeResponse(
         @Schema(description = "User ID", example = "1")
         Long id,
         @Schema(description = "User full name", example = "Nishant Kumar")
         String name,
         @Schema(description = "User email", example = "user@example.com")
         String email,
-        @Schema(description = "Assigned user role", example = "USER")
+        @Schema(description = "Current role", example = "USER")
         Role role
 ) {
 }
+

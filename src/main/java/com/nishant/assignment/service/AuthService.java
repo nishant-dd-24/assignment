@@ -44,4 +44,17 @@ public class AuthService {
         String token = jwtUtil.generateToken(user.getEmail(),  user.getRole());
         return new AuthResponse(token, user.getId(), user.getName(), user.getEmail(), user.getRole());
     }
+
+    public PromoteUserResponse promoteUserToAdmin(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> exceptionUtil.notFound("User not found"));
+
+        if (user.getRole() != Role.USER)
+            throw exceptionUtil.badRequest("Only users with USER role can be promoted");
+
+        user.setRole(Role.ADMIN);
+        userRepository.save(user);
+
+        return new PromoteUserResponse(user.getId(), user.getName(), user.getEmail(), user.getRole());
+    }
 }

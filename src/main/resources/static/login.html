@@ -3,25 +3,140 @@
 <head>
     <title>Login</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 400px; margin: 80px auto; padding: 20px; }
-        input { display: block; width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        .msg { padding: 8px; border-radius: 4px; margin-bottom: 10px; }
-        .error { background: #ffe0e0; color: #c00; }
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f3f4f6;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #d1d5db;
+            --card-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+            --radius: 14px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at top left, #e0e7ff, var(--bg) 45%);
+            color: var(--text);
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--card-shadow);
+        }
+
+        h2 {
+            margin: 0 0 6px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            margin: 0 0 20px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .field {
+            width: 100%;
+            padding: 11px 12px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+            outline: none;
+        }
+
+        .field::placeholder { color: #94a3b8; }
+
+        .field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 11px 14px;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .msg {
+            display: none;
+            margin-bottom: 14px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+            animation: fadeIn 0.25s ease;
+            font-size: 14px;
+        }
+
+        .error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: var(--danger);
+        }
+
+        .footer {
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .footer a:hover { text-decoration: underline; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-2px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-<h2>Login</h2>
-<div id="msg" class="msg" style="display:none"></div>
-<input type="email" id="email" placeholder="Email" />
-<input type="password" id="password" placeholder="Password" />
-<button onclick="login()">Login</button>
-<p>No account? <a href="/register.html">Register</a></p>
+<div class="card">
+    <h2>Login</h2>
+    <p class="subtitle">Sign in to continue managing your tasks.</p>
+    <div id="msg" class="msg"></div>
+    <input class="field" type="email" id="email" placeholder="Email" />
+    <input class="field" type="password" id="password" placeholder="Password" />
+    <button id="loginBtn" class="btn" onclick="login()">Login</button>
+    <p class="footer">No account? <a href="/register.html">Register</a></p>
+</div>
 
 <script>
     async function login() {
+        const btn = document.getElementById('loginBtn');
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
+        btn.disabled = true;
+        btn.textContent = 'Signing in...';
         try {
             const res = await fetch('/api/v1/auth/login', {
                 method: 'POST',
@@ -37,7 +152,10 @@
             const msg = document.getElementById('msg');
             msg.style.display = 'block';
             msg.className = 'msg error';
-            msg.textContent = e.message;
+            msg.textContent = e.message || 'Login failed';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Login';
         }
     }
 </script>

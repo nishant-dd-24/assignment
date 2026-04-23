@@ -2,7 +2,6 @@ package com.nishant.assignment.exception;
 
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.nishant.assignment.entity.Role;
 import com.nishant.assignment.exception.custom.CustomBadRequestException;
 import com.nishant.assignment.exception.custom.DuplicateResourceException;
 import com.nishant.assignment.exception.custom.ResourceNotFoundException;
@@ -11,7 +10,6 @@ import com.nishant.assignment.exception.response.ErrorResponse;
 import com.nishant.assignment.exception.response.ErrorResponseFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -136,7 +134,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNoHandlerFound(NoHandlerFoundException ex, HttpServletRequest request) {
+    public ErrorResponse handleNoHandlerFound(HttpServletRequest request) {
         return errorResponseFactory.build(HttpStatus.NOT_FOUND, "The requested resource was not found", ErrorCode.NOT_FOUND, request);
     }
 
@@ -148,7 +146,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleRuntimeException(Exception ex, HttpServletRequest request) {
+    public ErrorResponse handleRuntimeException(HttpServletRequest request) {
         return errorResponseFactory.build(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong", ErrorCode.INTERNAL_ERROR, request);
     }
 }

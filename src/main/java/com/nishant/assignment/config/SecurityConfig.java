@@ -1,4 +1,3 @@
-// src/main/java/com/example/assignment/config/SecurityConfig.java
 package com.nishant.assignment.config;
 
 import com.nishant.assignment.exception.security.CustomAccessDeniedHandler;
@@ -27,7 +26,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(ex -> ex
@@ -40,7 +39,12 @@ public class SecurityConfig {
                                 "/swagger-ui/**", "/swagger-ui.html",
                                 "/api-docs/**",
                                 "/v3/api-docs/**",
-                                "/*.html", "/css/**", "/js/**"   // serve static frontend
+                                "/*.html", "/css/**", "/js/**",
+                                "/register",
+                                "/login",
+                                "/dashbord",
+                                "/docs",
+                                "/", "/index", "/home"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -58,7 +62,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authManager(AuthenticationConfiguration config) {
         return config.getAuthenticationManager();
     }
 }

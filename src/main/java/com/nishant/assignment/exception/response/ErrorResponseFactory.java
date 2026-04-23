@@ -13,7 +13,6 @@ import java.util.Map;
 public class ErrorResponseFactory {
     public ErrorResponse build(HttpStatus status, String message, ErrorCode errorCode, HttpServletRequest request) {
         return ErrorResponse.builder()
-                .traceId((String) request.getAttribute("traceId"))
                 .path(request.getRequestURI())
                 .method(request.getMethod())
                 .status(status.value())
@@ -26,7 +25,6 @@ public class ErrorResponseFactory {
 
     public ErrorResponse build(HttpStatus status, String message, ErrorCode errorCode, Map<String, String> errors, HttpServletRequest request) {
         return ErrorResponse.builder()
-                .traceId((String) request.getAttribute("traceId"))
                 .path(request.getRequestURI())
                 .method(request.getMethod())
                 .status(status.value())
