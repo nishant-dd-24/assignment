@@ -1,27 +1,5 @@
 # Task Management API - Backend Intern Assignment
 
-🚀 **Live Demo:** https://assignment.nishantdd.dev
-
-⚡ No setup required — fully deployed (Dockerized + CI/CD)
-
-🔐 Quick Test Credentials
-
-Admin:
-- Email: admin@example.com
-- Password: 12345678
-  → Can view and manage all tasks
-
-User:
-- Email: user@example.com
-- Password: 12345678
-  → Can only manage own tasks
-
-👉 Try:
-- Creating tasks as user
-- Logging in as admin and viewing all tasks
-
-**Docker Hub:** https://hub.docker.com/r/nishantdd/assignment-api
-
 A secure, scalable REST API built with **Java 21 + Spring Boot 4**, featuring JWT authentication, role-based access control, and a vanilla JS frontend — all served from a single deployable service.
 
 ---
@@ -83,8 +61,6 @@ cp .env.example .env
 | Build            | Maven                                |
 | Containerisation | Docker + Docker Compose              |
 | Testing          | JUnit 5 + Mockito                    |
-| CI/CD            | GitHub Actions                       |
-| Image Registry   | Docker Hub                           |
 
 ---
 
@@ -327,54 +303,6 @@ cp .env.example .env
 
 ---
 
-## CI/CD and Deployment
-
-The project is deployed to a VPS via a GitHub Actions pipeline that triggers on every push to `main`.
-
-### Pipeline steps (`deploy.yml`)
-
-1. Check out the repository
-2. Log in to Docker Hub using repository secrets
-3. Build the Docker image and tag it as `nishantdd/assignment-api:latest`
-4. Push the image to Docker Hub
-5. SSH into the VPS and run `docker compose -f docker-compose.prod.yml up -d --force-recreate`
-6. Prune dangling images to keep the server clean
-
-### Docker Compose file layout
-
-The project uses three compose files to keep local and production concerns separate:
-
-| File                        | Purpose                                                               |
-|-----------------------------|-----------------------------------------------------------------------|
-| `docker-compose.yml`        | Base configuration — image, environment variables, healthcheck, volumes |
-| `docker-compose.override.yml` | Local development — exposes port `8080` to the host               |
-| `docker-compose.prod.yml`   | Production — uses `expose` instead of `ports` so only the reverse proxy can reach the container |
-
-Locally, Docker Compose automatically merges `docker-compose.yml` and `docker-compose.override.yml`, so `docker compose up` works without any extra flags.
-
-On the VPS, the pipeline explicitly selects the production overlay:
-
-```bash
-docker compose -f docker-compose.prod.yml up -d --force-recreate
-```
-
-### Deployment Architecture (Brief)
-
-- Nginx reverse proxy handles HTTPS and routes traffic to the API container
-- Services communicate via Docker internal network (no exposed backend ports)
-- Stateless API allows horizontal scaling behind the proxy
-
-### Required GitHub Actions secrets
-
-| Secret               | Description                              |
-|----------------------|------------------------------------------|
-| `DOCKER_USERNAME`    | Docker Hub username                      |
-| `DOCKER_PASSWORD`    | Docker Hub access token                  |
-| `SERVER_IP`          | VPS IP address or hostname               |
-| `SSH_PRIVATE_KEY`    | Private key for SSH access to the VPS    |
-
----
-
 ## Scalability Notes
 
 **Stateless Authentication**
@@ -397,9 +325,3 @@ Spring Actuator + Micrometer can expose metrics to Prometheus/Grafana with one d
 
 **Containerisation**
 Docker Compose bundles the application and PostgreSQL together. The same images deploy unchanged to AWS ECS, GCP Cloud Run, Railway, or Render.
-
----
-
-## License
-
-This project was built as a backend internship selection assignment for Primetrade.ai.
