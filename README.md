@@ -325,3 +325,8 @@ Spring Actuator + Micrometer can expose metrics to Prometheus/Grafana with one d
 
 **Containerisation**
 Docker Compose bundles the application and PostgreSQL together. The same images deploy unchanged to AWS ECS, GCP Cloud Run, Railway, or Render.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
